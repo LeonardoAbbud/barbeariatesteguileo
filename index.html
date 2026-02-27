@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barbearia do Léo & Gui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --dark:    #111111;
+      --card:    #181818;
+      --border:  #2a2a2a;
+      --gold:    #c9a84c;
+      --gold2:   #e8c96a;
+      --white:   #f5f0e8;
+      --muted:   #888;
+      --font-display: 'Playfair Display', serif;
+      --font-body:    'Barlow', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 400;
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ─────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5%;
+      background: rgba(10,10,10,0.0);
+      backdrop-filter: blur(0px);
+      transition: background .4s, backdrop-filter .4s, box-shadow .4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 2.4rem; list-style: none; }
+    .nav-links a {
+      color: var(--white); text-decoration: none;
+      font-size: .88rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+      opacity: .7; transition: opacity .2s, color .2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+    .nav-cta {
+      background: var(--gold); color: var(--black);
+      padding: .55rem 1.3rem; border-radius: 2px;
+      font-size: .82rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      text-decoration: none; transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+
+    /* hamburger */
+    .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .burger span { display: block; width: 24px; height: 2px; background: var(--white); transition: .3s; }
+    .burger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    .mobile-menu {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10,10,10,.97); z-index: 99;
+      flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--white); text-decoration: none; font-size: 1.6rem;
+      font-family: var(--font-display); transition: color .2s;
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+
+    /* ── HERO ───────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      background: var(--black);
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 40%, rgba(201,168,76,.13) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(201,168,76,.07) 0%, transparent 60%);
+    }
+    .hero-lines {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .hero-lines::before, .hero-lines::after {
+      content: '';
+      position: absolute;
+      border: 1px solid rgba(201,168,76,.08);
+      border-radius: 50%;
+    }
+    .hero-lines::before { width: 900px; height: 900px; top: -200px; right: -300px; }
+    .hero-lines::after  { width: 600px; height: 600px; bottom: -200px; left: -200px; }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 8rem 5% 5rem;
+      max-width: 860px;
+    }
+    .hero-badge {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: .75rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+      padding: .4rem 1.2rem; margin-bottom: 2rem; border-radius: 2px;
+      opacity: 0; animation: fadeUp .8s .2s forwards;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 900; line-height: 1;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .9s .4s forwards;
+    }
+    .hero-title em { color: var(--gold); font-style: normal; }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted); font-weight: 300; line-height: 1.7;
+      max-width: 520px; margin: 0 auto 2.8rem;
+      opacity: 0; animation: fadeUp .9s .6s forwards;
+    }
+    .hero-buttons {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .9s .8s forwards;
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--black);
+      padding: .9rem 2.2rem; border-radius: 2px;
+      font-weight: 700; font-size: .9rem; letter-spacing: .08em; text-transform: uppercase;
+      text-decoration: none; transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 24px rgba(201,168,76,.25);
+    }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,.4); }
+    .btn-outline {
+      border: 1px solid rgba(245,240,232,.25); color: var(--white);
+      padding: .9rem 2.2rem; border-radius: 2px;
+      font-weight: 500; font-size: .9rem; letter-spacing: .06em; text-transform: uppercase;
+      text-decoration: none; transition: border-color .2s, background .2s;
+    }
+    .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,.06); }
+
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      opacity: 0; animation: fadeUp .8s 1.2s forwards;
+    }
+    .hero-scroll span { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes scrollPulse { 0%,100% { opacity:.4; transform: scaleY(1); } 50% { opacity:1; transform: scaleY(.7); } }
+
+    /* ── SECTION COMMONS ────────────────────────── */
+    section { padding: 7rem 5%; }
+    .section-label {
+      font-size: .72rem; letter-spacing: .25em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: .8rem; font-weight: 600;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900; line-height: 1.1; color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .section-desc {
+      color: var(--muted); font-weight: 300; line-height: 1.8;
+      max-width: 520px; font-size: 1.02rem;
+    }
+    .divider {
+      width: 48px; height: 2px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin: 1.5rem 0;
+    }
+
+    /* ── SERVICES ───────────────────────────────── */
+    #servicos { background: var(--dark); }
+    .services-header { margin-bottom: 4rem; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5px;
+      border: 1.5px solid var(--border);
+    }
+    .service-card {
+      background: var(--card);
+      padding: 2.5rem 2rem;
+      border: 1.5px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: background .3s;
+      cursor: default;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .4s cubic-bezier(.77,0,.175,1);
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { background: #1e1e1e; }
+    .service-icon {
+      font-size: 2rem; margin-bottom: 1.2rem;
+      display: block; transition: transform .3s;
+    }
+    .service-card:hover .service-icon { transform: scale(1.1); }
+    .service-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem; font-weight: 700; color: var(--white);
+      margin-bottom: .5rem;
+    }
+    .service-desc { color: var(--muted); font-size: .92rem; line-height: 1.7; margin-bottom: 1.2rem; }
+    .service-price {
+      font-size: 1.4rem; font-weight: 700; color: var(--gold);
+      font-family: var(--font-display);
+    }
+
+    /* ── ABOUT ──────────────────────────────────── */
+    #sobre {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem; align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-img-wrap {
+      width: 100%; aspect-ratio: 3/4;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem; position: relative; overflow: hidden;
+      border-radius: 2px;
+    }
+    .about-img-wrap::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,.08) 0%, transparent 60%);
+    }
+    .about-tag {
+      position: absolute; bottom: -1.5rem; right: -1.5rem;
+      background: var(--gold); color: var(--black);
+      font-family: var(--font-display);
+      font-size: 3rem; font-weight: 900;
+      padding: 1.5rem 2rem; line-height: 1;
+    }
+    .about-tag small { display: block; font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-body); }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem;
+    }
+    .stat {
+      border-left: 2px solid var(--gold);
+      padding-left: 1rem;
+    }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 2.2rem; font-weight: 900; color: var(--gold); line-height: 1;
+    }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: .2rem; letter-spacing: .05em; }
+
+    /* ── REVIEWS ────────────────────────────────── */
+    #avaliacoes { background: var(--dark); }
+    .reviews-header { margin-bottom: 4rem; }
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .review-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      padding: 2rem;
+      border-radius: 2px;
+      position: relative;
+      transition: border-color .3s, transform .3s;
+    }
+    .review-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .review-stars { color: var(--gold); font-size: 1rem; margin-bottom: 1rem; letter-spacing: 2px; }
+    .review-text {
+      color: var(--muted); font-size: .95rem; line-height: 1.75; margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+    .review-author { display: flex; align-items: center; gap: .9rem; }
+    .review-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; border: 2px solid var(--gold);
+      flex-shrink: 0;
+    }
+    .review-name { font-weight: 600; color: var(--white); font-size: .9rem; }
+    .review-since { font-size: .78rem; color: var(--muted); }
+
+    /* ── DIFERENCIAIS ───────────────────────────── */
+    #diferenciais {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem; align-items: center;
+    }
+    .diff-list { list-style: none; margin-top: 2rem; }
+    .diff-list li {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.2rem 0; border-bottom: 1px solid var(--border);
+    }
+    .diff-list li:last-child { border-bottom: none; }
+    .diff-icon { color: var(--gold); font-size: 1.3rem; margin-top: .1rem; flex-shrink: 0; }
+    .diff-text h4 { color: var(--white); font-weight: 600; margin-bottom: .25rem; }
+    .diff-text p { color: var(--muted); font-size: .88rem; line-height: 1.6; }
+    .diff-visual {
+      background: var(--card); border: 1.5px solid var(--border);
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: 8rem; border-radius: 2px;
+      position: relative; overflow: hidden;
+    }
+    .diff-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(201,168,76,.12) 0%, transparent 70%);
+    }
+
+    /* ── CTA ────────────────────────────────────── */
+    .cta-section {
+      background: var(--gold);
+      padding: 6rem 5%; text-align: center;
+    }
+    .cta-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900; color: var(--black); line-height: 1.1; margin-bottom: 1rem;
+    }
+    .cta-section p { color: rgba(10,10,10,.65); font-size: 1.05rem; margin-bottom: 2.5rem; }
+    .btn-dark {
+      background: var(--black); color: var(--gold);
+      padding: 1rem 2.5rem; border-radius: 2px;
+      font-weight: 700; font-size: .95rem; letter-spacing: .08em; text-transform: uppercase;
+      text-decoration: none; display: inline-block;
+      transition: background .2s, transform .15s;
+    }
+    .btn-dark:hover { background: #1a1a1a; transform: translateY(-2px); }
+
+    /* ── FOOTER ─────────────────────────────────── */
+    footer {
+      background: #050505;
+      padding: 4rem 5% 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem; margin-bottom: 3rem;
+    }
+    .footer-brand-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem; font-weight: 900; color: var(--gold);
+      margin-bottom: .8rem;
+    }
+    .footer-desc { color: var(--muted); font-size: .88rem; line-height: 1.7; max-width: 280px; }
+    .footer-col h4 {
+      color: var(--white); font-size: .8rem; font-weight: 600;
+      letter-spacing: .15em; text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: .7rem; }
+    .footer-col ul li a {
+      color: var(--muted); text-decoration: none; font-size: .88rem;
+      transition: color .2s;
+    }
+    .footer-col ul li a:hover { color: var(--gold); }
+    .footer-col ul li span { color: var(--muted); font-size: .88rem; }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 1.5rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { color: var(--muted); font-size: .78rem; }
+
+    /* ── WHATSAPP FLOAT ─────────────────────────── */
+    .wa-float {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+      background: #25D366; color: #fff;
+      width: 58px; height: 58px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(37,211,102,.4);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .wa-float:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(37,211,102,.55); }
+
+    /* ── SCROLL REVEAL ──────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 900px) {
+      #sobre, #diferenciais { grid-template-columns: 1fr; gap: 3rem; }
+      .about-tag { right: 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      .nav-links, .nav-cta { display: none; }
+      .burger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      section { padding: 5rem 5%; }
+      #sobre, #diferenciais { padding-top: 4rem; padding-bottom: 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Léo <span>&</span> Gui</a>
+  <ul class="nav-links">
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#avaliacoes">Avaliações</a></li>
+    <li><a href="#diferenciais">Diferenciais</a></li>
+  </ul>
+  <a href="https://wa.me/5511999999999" class="nav-cta" target="_blank" rel="noopener">Agendar agora</a>
+  <div class="burger" id="burger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#servicos" class="mobile-link">Serviços</a>
+  <a href="#sobre" class="mobile-link">Sobre</a>
+  <a href="#avaliacoes" class="mobile-link">Avaliações</a>
+  <a href="#diferenciais" class="mobile-link">Diferenciais</a>
+  <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" style="color:var(--gold)">Agendar pelo WhatsApp</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Barbearia Premium — Desde 2020</div>
+    <h1 class="hero-title">Corte que faz<br><em>diferença</em></h1>
+    <p class="hero-sub">Estilo, precisão e tradição. Na Barbearia do Léo & Gui, cada corte é feito com dedicação e arte para você sair diferente.</p>
+    <div class="hero-buttons">
+      <a href="https://wa.me/5511999999999" class="btn-primary" target="_blank" rel="noopener">📲 Agendar pelo WhatsApp</a>
+      <a href="#servicos" class="btn-outline">Ver serviços</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section id="servicos">
+  <div class="services-header reveal">
+    <div class="section-label">O que fazemos</div>
+    <h2 class="section-title">Nossos Serviços</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Do corte clássico à barba trabalhada, cuidamos de cada detalhe para você sair impecável.</p>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <span class="service-icon">✂️</span>
+      <div class="service-name">Corte Clássico</div>
+      <p class="service-desc">Corte social ou degradê executado com navalha e tesoura profissional.</p>
+      <div class="service-price">R$ 45</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🪒</span>
+      <div class="service-name">Barba Completa</div>
+      <p class="service-desc">Modelagem, hidratação e acabamento com toalha quente. Estilo garantido.</p>
+      <div class="service-price">R$ 35</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">👑</span>
+      <div class="service-name">Combo Premium</div>
+      <p class="service-desc">Corte + barba + sobrancelha + produtos premium. Experiência completa.</p>
+      <div class="service-price">R$ 75</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">💆</span>
+      <div class="service-name">Hidratação Capilar</div>
+      <p class="service-desc">Tratamento profundo para cabelos ressecados ou danificados.</p>
+      <div class="service-price">R$ 50</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">⚡</span>
+      <div class="service-name">Progressiva Masculina</div>
+      <p class="service-desc">Alinhamento e definição dos fios para um visual moderno e liso.</p>
+      <div class="service-price">R$ 120</div>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🌿</span>
+      <div class="service-name">Sobrancelha</div>
+      <p class="service-desc">Design e aparagem precisa para um rosto mais definido e expressivo.</p>
+      <div class="service-price">R$ 20</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="about-visual reveal">
+    <div class="about-img-wrap">
+      ✂️
+    </div>
+    <div class="about-tag">
+      4+
+      <small>anos de experiência</small>
+    </div>
+  </div>
+  <div class="about-content reveal">
+    <div class="section-label">Quem somos</div>
+    <h2 class="section-title">A Barbearia do Léo & Gui</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Somos uma barbearia que nasceu da paixão pelo ofício. Léo e Gui se uniram para criar um espaço onde estilo e acolhimento caminham juntos — um lugar onde você chega cliente e sai amigo.</p>
+    <p class="section-desc" style="margin-top:1rem;">Cada detalhe do ambiente foi pensado para que você se sinta à vontade, enquanto nosso trabalho fala por si.</p>
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-num">+800</div>
+        <div class="stat-label">Clientes atendidos</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Avaliação média</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Satisfação garantida</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">6 dias</div>
+        <div class="stat-label">Funcionamento semanal</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AVALIAÇÕES -->
+<section id="avaliacoes">
+  <div class="reviews-header reveal">
+    <div class="section-label">O que dizem</div>
+    <h2 class="section-title">Avaliações dos Clientes</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Melhor barbearia da região. O Léo tem uma habilidade incrível com a navalha, acabamento impecável. Virei cliente fiel!"</p>
+      <div class="review-author">
+        <div class="review-avatar">👨</div>
+        <div>
+          <div class="review-name">Rafael Mendes</div>
+          <div class="review-since">Cliente há 2 anos</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"O Gui é fera demais no degradê. Fui pela primeira vez sem expectativa e saí completamente apaixonado pelo resultado."</p>
+      <div class="review-author">
+        <div class="review-avatar">🧔</div>
+        <div>
+          <div class="review-name">Bruno Alves</div>
+          <div class="review-since">Cliente há 8 meses</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Ambiente super agradável, ótimo atendimento e preço justo. Já indiquei pra galera toda. Não troco por nada!"</p>
+      <div class="review-author">
+        <div class="review-avatar">👦</div>
+        <div>
+          <div class="review-name">Thiago Costa</div>
+          <div class="review-since">Cliente há 1 ano</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIAIS -->
+<section id="diferenciais">
+  <div class="about-content reveal">
+    <div class="section-label">Por que nos escolher</div>
+    <h2 class="section-title">Nossos Diferenciais</h2>
+    <div class="divider"></div>
+    <ul class="diff-list">
+      <li>
+        <div class="diff-icon">⏱️</div>
+        <div class="diff-text">
+          <h4>Agendamento Fácil pelo WhatsApp</h4>
+          <p>Sem fila, sem espera. Reserve seu horário em segundos diretamente no WhatsApp.</p>
+        </div>
+      </li>
+      <li>
+        <div class="diff-icon">🎯</div>
+        <div class="diff-text">
+          <h4>Profissionais Certificados</h4>
+          <p>Léo e Gui possuem formação profissional e atualização constante nas técnicas.</p>
+        </div>
+      </li>
+      <li>
+        <div class="diff-icon">🌿</div>
+        <div class="diff-text">
+          <h4>Produtos Premium</h4>
+          <p>Utilizamos apenas produtos de alta qualidade, seguros para sua pele e cabelo.</p>
+        </div>
+      </li>
+      <li>
+        <div class="diff-icon">🏆</div>
+        <div class="diff-text">
+          <h4>Ambiente Exclusivo</h4>
+          <p>Um espaço pensado para o homem moderno — confortável, limpo e acolhedor.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="diff-visual reveal">✂️</div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section reveal">
+  <h2>Pronto para um novo visual?</h2>
+  <p>Agende agora e garanta seu horário. Atendemos de terça a domingo.</p>
+  <a href="https://wa.me/5511999999999" class="btn-dark" target="_blank" rel="noopener">📲 Falar no WhatsApp</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Léo & Gui</div>
+      <p class="footer-desc">Barbearia premium com atendimento personalizado. Estilo e tradição no mesmo lugar.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <ul>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#sobre">Sobre nós</a></li>
+        <li><a href="#avaliacoes">Avaliações</a></li>
+        <li><a href="#diferenciais">Diferenciais</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <ul>
+        <li><a href="https://wa.me/5511999999999" target="_blank" rel="noopener">📲 (11) 99999-9999</a></li>
+        <li><span>📍 Rua das Flores, 123</span></li>
+        <li><span>🕐 Ter–Sáb: 9h–20h</span></li>
+        <li><span>🕐 Dom: 9h–14h</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Barbearia do Léo & Gui. Todos os direitos reservados.</p>
+    <p style="color:var(--muted); font-size:.78rem;">Feito com ✂️ e muito estilo</p>
+  </div>
+</footer>
+
+<!-- BOTÃO FLUTUANTE WHATSAPP -->
+<a href="https://wa.me/5511999999999" class="wa-float" target="_blank" rel="noopener" title="Falar no WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Hamburger menu
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  });
+  document.querySelectorAll('.mobile-link, .mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
